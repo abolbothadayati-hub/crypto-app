@@ -8,8 +8,7 @@
   "dependencies": {
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
-    "@codetrix-studio/capacitor-google-auth": "^3.3.5",
-    "@capgo/capacitor-persistent-uuid": "^0.0.4"
+    "@codetrix-studio/capacitor-google-auth": "^3.3.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
