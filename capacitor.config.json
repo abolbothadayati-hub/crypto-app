@@ -1,0 +1,15 @@
+{
+  "appId": "com.ezzdigi.sahmnegar",
+  "appName": "سهام یکم",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "REPLACE_WITH_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
+}
