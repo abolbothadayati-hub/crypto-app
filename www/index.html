@@ -3058,7 +3058,7 @@ function getBrsApiKey() {
 
 // BrsApi برای فراخوانی مستقیم از مرورگر/WebView هدر CORS نمی‌فرستد، پس اول مستقیم امتحان می‌کنیم
 // و در صورت شکست (خطای شبکه/CORS) از یک پراکسی عمومی CORS به‌عنوان جایگزین استفاده می‌کنیم.
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+const CORS_PROXY = 'https://sahmyekom.ir/backend/api/brs_proxy.php?url=';
 function fetchWithTimeout(url, ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
