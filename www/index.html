@@ -3056,7 +3056,9 @@ function getBrsApiKey() {
   }
 }
 
-// دریافت مستقیم اطلاعات BrsApi — بدون هیچ پراکسی یا CORS proxy
+// BrsApi برای فراخوانی مستقیم از مرورگر/WebView هدر CORS نمی‌فرستد، پس اول مستقیم امتحان می‌کنیم
+// و در صورت شکست (خطای شبکه/CORS) از یک پراکسی عمومی CORS به‌عنوان جایگزین استفاده می‌کنیم.
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 function fetchWithTimeout(url, ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
@@ -3069,8 +3071,10 @@ async function brsFetch(url) {
     if (res && res.ok) return res;
     throw new Error('HTTP ' + (res ? res.status : '?'));
   } catch (e) {
-    console.warn('[BrsApi] اتصال مستقیم ناموفق بود:', e);
-    throw new Error('اتصال مستقیم به سرور اطلاعات برقرار نشد. ممکن است API دسترسی مرورگر (CORS) نداشته باشد.');
+    console.warn('[BrsApi] اتصال مستقیم ناموفق بود، تلاش از طریق پراکسی:', e);
+    const res2 = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 15000);
+    if (res2 && res2.ok) return res2;
+    throw new Error('اتصال به سرور اطلاعات (حتی از طریق پراکسی) برقرار نشد.');
   }
 }
 
