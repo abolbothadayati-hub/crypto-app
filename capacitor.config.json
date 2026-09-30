@@ -11,6 +11,8 @@
     },
     "GoogleAuth": {
       "scopes": ["profile", "email"],
+      "clientId": "1095480477348-frsje22lgdt0jg40n0bn1backit24rpj.apps.googleusercontent.com",
+      "androidClientId": "1095480477348-frsje22lgdt0jg40n0bn1backit24rpj.apps.googleusercontent.com",
       "serverClientId": "1095480477348-frsje22lgdt0jg40n0bn1backit24rpj.apps.googleusercontent.com",
       "forceCodeForRefreshToken": true
     }
