@@ -3066,15 +3066,22 @@ function fetchWithTimeout(url, ms) {
 }
 
 async function brsFetch(url) {
+  let directErr = '';
   try {
     const res = await fetchWithTimeout(url, 10000);
     if (res && res.ok) return res;
-    throw new Error('HTTP ' + (res ? res.status : '?'));
+    directErr = 'HTTP ' + (res ? res.status : '?');
   } catch (e) {
-    console.warn('[BrsApi] اتصال مستقیم ناموفق بود، تلاش از طریق پراکسی:', e);
+    directErr = (e && e.name ? e.name : 'Error') + ': ' + (e && e.message ? e.message : e);
+  }
+  console.warn('[BrsApi] اتصال مستقیم ناموفق بود (' + directErr + ')، تلاش از طریق پراکسی...');
+  try {
     const res2 = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 15000);
     if (res2 && res2.ok) return res2;
-    throw new Error('اتصال به سرور اطلاعات (حتی از طریق پراکسی) برقرار نشد.');
+    throw new Error('HTTP ' + (res2 ? res2.status : '?'));
+  } catch (e2) {
+    const proxyErr = (e2 && e2.name ? e2.name : 'Error') + ': ' + (e2 && e2.message ? e2.message : e2);
+    throw new Error('تشخیص خطا — مستقیم: [' + directErr + ']  پراکسی: [' + proxyErr + ']');
   }
 }
 
