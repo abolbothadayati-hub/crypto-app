@@ -3306,7 +3306,7 @@ async function fetchMarketOverview() {
 
   try {
     const [indexRes, goldCurrencyRes] = await Promise.all([
-      brsFetch(`https://Api.BrsApi.ir/Tsetmc/Index.php?key=${encodeURIComponent(getBrsApiKey())}&type=Number`),
+      brsFetch(`https://Api.BrsApi.ir/Tsetmc/Index.php?key=${encodeURIComponent(getBrsApiKey())}&type=Number`).catch(function(){ return { ok: false, status: 0 }; }),
       brsFetch(`https://Api.BrsApi.ir/Market/Gold_Currency.php?key=${encodeURIComponent(getBrsApiKey())}`)
     ]);
 
@@ -3386,8 +3386,9 @@ async function fetchMarketOverview() {
 
 // --- تب «تحلیل شاخص بورس»: مقدار لحظه‌ای + نمودار روند + سیگنال ساده بر اساس تاریخچه محلی ---
 async function fetchIndexOnly() {
-  const res = await brsFetch(`https://Api.BrsApi.ir/Tsetmc/Index.php?key=${encodeURIComponent(getBrsApiKey())}&type=Number`);
-  if (!res.ok) return { ok: false, status: res.status, value: null, changePct: null };
+  let res = null;
+  try { res = await brsFetch(`https://Api.BrsApi.ir/Tsetmc/Index.php?key=${encodeURIComponent(getBrsApiKey())}&type=Number`); } catch (e) { res = null; }
+  if (!res || !res.ok) return { ok: false, status: res ? res.status : 0, value: null, changePct: null };
   const raw = await res.json();
   let obj = deepFindByName(raw, ['شاخص کل بورس', 'شاخص کل', 'TEDPIX', 'Total Index', 'shakhes kol'], 0);
   if (!obj && raw && typeof raw === 'object' && !Array.isArray(raw)) obj = raw;
