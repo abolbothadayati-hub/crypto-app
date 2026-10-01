@@ -3378,7 +3378,7 @@ async function fetchMarketOverview() {
     }
   } catch (e) {
     moStatus.style.display = 'block';
-    moStatus.textContent = 'خطا در اتصال به سرویس داده بازار (حتی از طریق پراکسی). لطفا اتصال اینترنت را بررسی کنید یا بعدا دوباره تلاش کنید.';
+    moStatus.textContent = 'جزئیات خطا: ' + (e && e.message ? e.message : String(e));
     console.warn('[نمای کلی بازار] خطای fetch:', e);
     setApiStatus('err', 'قطع — خطای اتصال');
   }
