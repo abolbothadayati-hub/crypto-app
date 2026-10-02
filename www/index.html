@@ -3042,17 +3042,49 @@ const TF_CONFIG = {
 };
 let chatHistory = [];
 
-// کلید رایگان پیش‌فرض BrsApi برای نمادهای بورس/فرابورس ایران
+// کلید مشترک BrsApi از پنل ادمین (بک‌اند) خوانده می‌شود، نه از کد اپ —
+// یعنی ادمین می‌تونه بدون نیاز به نسخه‌ی جدید اپ، کلید مشترک رو عوض کنه.
 // (در صورت تنظیم کلید شخصی توسط کاربر در بخش «تنظیمات»، آن کلید جایگزین می‌شود)
-const brsApiKey = 'FreeSV0E1LSgB9RDjuf0QorSLViX8pPG';
+const BRS_DEFAULT_KEY_CACHE = 'ezzdigi_brsapi_default_key_cache';
 const BRS_USER_KEY_STORAGE = 'ezzdigi_brsapi_user_key';
+let brsDefaultKeyRuntime = null; // در حافظه، بعد از اولین دریافت موفق از سرور
+
+// در اولین اجرای اپ، کلید مشترک فعلی رو از بک‌اند می‌گیره و کش می‌کنه
+async function refreshDefaultBrsApiKey() {
+  try {
+    const res = await fetchWithTimeout('https://sahmyekom.ir/backend/api/public_config.php', 8000);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && data.brsapi_key) {
+        brsDefaultKeyRuntime = data.brsapi_key;
+        try { localStorage.setItem(BRS_DEFAULT_KEY_CACHE, data.brsapi_key); } catch (e) {}
+      }
+    }
+  } catch (e) {
+    console.warn('[BrsApi] گرفتن کلید مشترک از سرور ناموفق بود، از کش/مقدار قبلی استفاده می‌شود', e);
+  }
+}
 
 function getBrsApiKey() {
   try {
     const userKey = localStorage.getItem(BRS_USER_KEY_STORAGE);
-    return (userKey && userKey.trim()) ? userKey.trim() : brsApiKey;
+    if (userKey && userKey.trim()) return userKey.trim();
+  } catch (e) {}
+  if (brsDefaultKeyRuntime) return brsDefaultKeyRuntime;
+  try {
+    const cached = localStorage.getItem(BRS_DEFAULT_KEY_CACHE);
+    if (cached && cached.trim()) return cached.trim();
+  } catch (e) {}
+  return 'FreeSV0E1LSgB9RDjuf0QorSLViX8pPG'; // آخرین راه، فقط اگر هیچ‌کدام بالا در دسترس نبود
+}
+refreshDefaultBrsApiKey(); // همین الان، در پس‌زمینه، کلید مشترک را از سرور بگیر
+
+function isUsingSharedKey() {
+  try {
+    const userKey = localStorage.getItem(BRS_USER_KEY_STORAGE);
+    return !(userKey && userKey.trim());
   } catch (e) {
-    return brsApiKey;
+    return true;
   }
 }
 
@@ -5378,7 +5410,7 @@ document.querySelectorAll('.main-nav-tab').forEach(tab => {
     } else if (tab.dataset.view === 'fibPullback') {
       fibPullbackView.style.display = 'block';
       const w3 = document.getElementById('fibKeyWarning');
-      if (w3) w3.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w3) w3.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       if (!fibLoaded) loadFibSignals(false);
     } else if (tab.dataset.view === 'smartList') {
       smartListView.style.display = 'block';
@@ -5386,34 +5418,34 @@ document.querySelectorAll('.main-nav-tab').forEach(tab => {
     } else if (tab.dataset.view === 'emaSignals') {
       emaSignalsView.style.display = 'block';
       const w = document.getElementById('emaKeyWarning');
-      if (w) w.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w) w.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       if (!emaLoaded) loadEmaSignals(false);
     } else if (tab.dataset.view === 'resSignals') {
       resSignalsView.style.display = 'block';
       const w2 = document.getElementById('resKeyWarning');
-      if (w2) w2.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w2) w2.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       if (!resLoaded) loadResSignals(false);
     } else if (tab.dataset.view === 'indexAnalysis') {
       indexAnalysisView.style.display = 'block';
       const w4 = document.getElementById('idxKeyWarning');
-      if (w4) w4.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w4) w4.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       loadIndexAnalysis();
     } else if (tab.dataset.view === 'options') {
       optionsView.style.display = 'block';
       const w5 = document.getElementById('optKeyWarning');
-      if (w5) w5.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w5) w5.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       renderOptionsList();
       getOptionSymbols().forEach(sym => { if (!OPT_CACHE[sym]) analyzeOptionSymbol(sym); });
     } else if (tab.dataset.view === 'rights') {
       rightsView.style.display = 'block';
       const w6 = document.getElementById('rgtKeyWarning');
-      if (w6) w6.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w6) w6.style.display = (isUsingSharedKey()) ? 'block' : 'none';
       renderRightsList();
       getRightsSymbols().forEach(sym => { if (!RGT_CACHE[sym]) analyzeRightsSymbol(sym); });
     } else if (tab.dataset.view === 'tableau') {
       tableauView.style.display = 'block';
       const w7 = document.getElementById('tblKeyWarning');
-      if (w7) w7.style.display = (getBrsApiKey() === brsApiKey) ? 'block' : 'none';
+      if (w7) w7.style.display = (isUsingSharedKey()) ? 'block' : 'none';
     } else {
       analyzerView.style.display = 'block';
     }
@@ -6427,7 +6459,7 @@ async function loadEmaSignals(force) {
   const progress = document.getElementById('emaProgress');
   const apiEl = document.getElementById('emaApiStatus');
   const warnEl = document.getElementById('emaKeyWarning');
-  const usingSharedKey = getBrsApiKey() === brsApiKey;
+  const usingSharedKey = isUsingSharedKey();
   if (warnEl) warnEl.style.display = usingSharedKey ? 'block' : 'none';
   const origLabel = btn.textContent;
   btn.textContent = '⏳ در حال اسکن...';
@@ -6721,7 +6753,7 @@ async function loadResSignals(force) {
   btn.textContent = 'در حال اسکن...';
   if (progress) { progress.style.display = 'block'; progress.textContent = 'شروع اسکن...'; }
   const warnEl = document.getElementById('resKeyWarning');
-  const usingSharedKey = getBrsApiKey() === brsApiKey;
+  const usingSharedKey = isUsingSharedKey();
   if (warnEl) warnEl.style.display = usingSharedKey ? 'block' : 'none';
 
   const total = RP_SYMBOLS.length;
@@ -6942,7 +6974,7 @@ async function loadFibSignals(force) {
   btn.textContent = 'در حال اسکن...';
   if (progress) { progress.style.display = 'block'; progress.textContent = 'شروع اسکن...'; }
   const warnEl = document.getElementById('fibKeyWarning');
-  const usingSharedKey = getBrsApiKey() === brsApiKey;
+  const usingSharedKey = isUsingSharedKey();
   if (warnEl) warnEl.style.display = usingSharedKey ? 'block' : 'none';
 
   const total = RP_SYMBOLS.length;
@@ -7598,9 +7630,7 @@ if (savedRiskProfile) {
   .sn-field{width:100%;padding:11px 12px;margin-bottom:10px;border-radius:9px;border:1px solid #232838;background:#202521;color:#EAEFF7;font-size:14px;box-sizing:border-box;font-family:'Vazirmatn',sans-serif}
   .sn-btn{width:100%;padding:11px 0;border-radius:9px;border:none;background:#78B89A;color:#06140E;font-weight:800;font-size:14.5px;cursor:pointer;margin-top:4px}
   .sn-btn.secondary{background:#1C2233;color:#EAEFF7;border:1px solid #2C3348}
-  .sn-google{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 0;border-radius:9px;border:1px solid #2C3348;background:#181D2A;color:#EAEFF7;font-size:14px;cursor:pointer;margin-top:10px}
   .sn-err{color:#FF5C72;font-size:12.5px;text-align:center;min-height:16px;margin:4px 0}
-  .sn-or{text-align:center;color:#576078;font-size:11.5px;margin:10px 0 2px}
   .sn-plan{border:1px solid #232838;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer}
   .sn-plan.rec{border-color:#78B89A}
   .sn-plan-top{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#EAEFF7}
@@ -7621,8 +7651,6 @@ if (savedRiskProfile) {
     <input class="sn-field" id="snPass" type="password" placeholder="رمز عبور" />
     <div class="sn-err" id="snAuthErr"></div>
     <button class="sn-btn" id="snAuthSubmit">ورود</button>
-    <div class="sn-or">یا</div>
-    <button class="sn-google" id="snGoogleBtn">🔵 ورود با حساب گوگل</button>
   </div>
 
   <div class="sn-box" id="snSubBox" style="display:none">
@@ -7765,27 +7793,6 @@ if (savedRiskProfile) {
         applyStatus(res.data.status);
       }).catch(function(){ errEl.textContent = 'خطا در اتصال به سرور'; });
     });
-  };
-
-  // --- ورود با گوگل ---
-  document.getElementById('snGoogleBtn').onclick = function(){
-    var errEl = document.getElementById('snAuthErr');
-    errEl.textContent = '';
-    try {
-      var GoogleAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
-      if (!GoogleAuth) { errEl.textContent = 'ورود با گوگل روی این نسخه در دسترس نیست'; return; }
-      GoogleAuth.signIn().then(function(user){
-        var idToken = user && user.authentication && user.authentication.idToken;
-        if (!idToken) { errEl.textContent = 'دریافت توکن گوگل ناموفق بود'; return; }
-        getDeviceId().then(function(deviceId){
-          apiPost('/google_login.php', {id_token: idToken, device_uuid: deviceId}, false).then(function(res){
-            if (!res.ok) { errEl.textContent = res.data.error || 'خطایی رخ داد'; return; }
-            setToken(res.data.token);
-            applyStatus(res.data.status);
-          });
-        });
-      }).catch(function(){ errEl.textContent = 'ورود با گوگل لغو یا ناموفق بود'; });
-    } catch(e) { errEl.textContent = 'ورود با گوگل در دسترس نیست'; }
   };
 
   // --- انتخاب پلن و پرداخت ---
