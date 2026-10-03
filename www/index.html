@@ -1915,7 +1915,7 @@ a{color:#9be0b9 !important}
       <div class="main-nav-section-title">پیشنهادهای بازار</div>
       <div class="main-nav-tab" data-view="bourseScreener">🏛️ پیشنهاد بورس</div>
       <div class="main-nav-tab" data-view="cryptoScreener">🪙 پیشنهاد ارز دیجیتال</div>
-      <div class="main-nav-tab" data-view="rantScreener">💎 سهام رانتی پرپتانسیل</div>
+      <div class="main-nav-tab" data-view="rantScreener">💎 سهام پرپتانسیل</div>
       <div class="main-nav-tab" data-view="fibPullback">📐 ورود فیبوناچی + پولبک</div>
     </div>
 
@@ -2451,11 +2451,11 @@ a{color:#9be0b9 !important}
   <div id="rantScreenerView" style="display:none;">
     <div class="screener-card">
       <div class="screener-header">
-        <div class="screener-title">سهام رانتی با پتانسیل بالا</div>
+        <div class="screener-title">سهام با پتانسیل بالا</div>
         <button class="screener-refresh-btn" id="rantScreenerRefreshBtn">⟲ به‌روزرسانی</button>
       </div>
       <div class="screener-desc">
-        نمادهایی که به‌طور ساختاری از یک مزیت غیررقابتی (رانت) بهره می‌برند — نرخ خوراک/انرژی ارزان دولتی، نرخ ارز ترجیحی یا نیمایی برای صادرات، انحصار یا شبه‌انحصار در بازار داخلی، یا قیمت‌گذاری دستوری محصول — که معمولاً حاشیه سود آن‌ها را در برابر نوسان هزینه محافظت می‌کند. سیگنال خرید/فروش بر اساس همان موتور تحلیل (RSI، روند، ساختار اسمارت مانی، Pivot) محاسبه می‌شود.
+        نمادهایی که به‌طور ساختاری از یک مزیت ساختاری بهره می‌برند — نرخ خوراک/انرژی ارزان دولتی، نرخ ارز ترجیحی یا نیمایی برای صادرات، انحصار یا شبه‌انحصار در بازار داخلی، یا قیمت‌گذاری دستوری محصول — که معمولاً حاشیه سود آن‌ها را در برابر نوسان هزینه محافظت می‌کند. سیگنال خرید/فروش بر اساس همان موتور تحلیل (RSI، روند، ساختار اسمارت مانی، Pivot) محاسبه می‌شود.
       </div>
       <div class="tf-tabs screener-tf-tabs" id="rantScreenerTfTabs">
         <div class="tf-tab" data-tf="15m">۱۵ دقیقه</div>
@@ -2466,7 +2466,7 @@ a{color:#9be0b9 !important}
       </div>
       <div class="screener-status" id="rantScreenerStatus">برای دریافت پیشنهادها روی این تب کلیک کنید…</div>
       <div class="screener-list" id="rantScreenerList"></div>
-      <div class="screener-disclaimer">این لیست صرفاً بر اساس ویژگی ساختاری صنعت (نه اطلاعات نهانی یا محرمانه) دسته‌بندی شده و توصیه مالی قطعی نیست؛ رانت بودن یک صنعت به‌تنهایی تضمین سودآوری سهم نیست و ریسک تغییر سیاست‌های دولتی (نرخ خوراک/ارز/قیمت‌گذاری) همیشه وجود دارد.</div>
+      <div class="screener-disclaimer">این لیست صرفاً بر اساس ویژگی ساختاری صنعت (نه اطلاعات نهانی یا محرمانه) دسته‌بندی شده و توصیه مالی قطعی نیست؛ مزیت ساختاری یک صنعت به‌تنهایی تضمین سودآوری سهم نیست و ریسک تغییر سیاست‌های دولتی (نرخ خوراک/ارز/قیمت‌گذاری) همیشه وجود دارد.</div>
     </div>
   </div><!-- /#rantScreenerView -->
 
@@ -3748,9 +3748,9 @@ async function loadCryptoScreener(force) {
   cryptoScreenerLoaded = true;
 }
 
-// نمادهایی که به‌طور ساختاری از یک مزیت غیررقابتی (رانت) بهره می‌برند:
+// نمادهایی که به‌طور ساختاری از یک مزیت صنعتی بهره می‌برند:
 // پتروشیمی/پالایشی (خوراک گاز/نفت ارزان دولتی)، فولادی/معدنی (نرخ ارز صادراتی ترجیحی)،
-// خودرویی (قیمت‌گذاری دستوری/انحصار داخلی)، هلدینگ‌های بزرگ دولتی با رانت ساختاری
+// خودرویی (قیمت‌گذاری دستوری/انحصار داخلی)، هلدینگ‌های بزرگ دولتی با مزیت ساختاری
 const RANT_SCREENER_SYMBOLS = [
   'فولاد', 'فملی', 'کچاد', 'کگل', 'ذوب', 'کاوه', 'ارفع', 'فخوز', 'هرمز',
   'شپنا', 'شبندر', 'شتران', 'شبریز', 'شاوان', 'شراز',
@@ -6919,6 +6919,8 @@ let fibData = {};       // sym -> { status:'loading'|'ok'|'error', full, result,
 let fibLoaded = false;
 let fibCancelled = false;
 let fibScanning = false;
+const FIB_MAX_SCAN = 10; // حداکثر تعداد نماد در هر اسکن (برای جلوگیری از اتمام سهمیه درخواست)
+let fibScanTotal = FIB_MAX_SCAN;
 const fibSleep = ms => new Promise(r => setTimeout(r, ms));
 
 // یک نماد را واکشی و تحلیل می‌کند: آیا قیمت فعلی نزدیک یک سطح فیبوناچی پولبکِ هم‌راستا با ساختار بازار است؟
@@ -6977,9 +6979,23 @@ async function loadFibSignals(force) {
   const usingSharedKey = isUsingSharedKey();
   if (warnEl) warnEl.style.display = usingSharedKey ? 'block' : 'none';
 
-  const total = RP_SYMBOLS.length;
+  // فقط ۱۰ نمادی که بیشترین ورود پول حقیقی را دارند اسکن می‌شوند (از داده‌ی تب «رد پول»، بدون درخواست اضافه)
+  let batch;
+  const live = (typeof rpData !== 'undefined' ? rpData : []).filter(d => d && d.fromAPI);
+  if (live.length >= FIB_MAX_SCAN) {
+    batch = live
+      .slice()
+      .sort((x, y) => ((y.buyFlow - y.sellFlow) - (x.buyFlow - x.sellFlow)) || ((y.volMult || 0) - (x.volMult || 0)))
+      .slice(0, FIB_MAX_SCAN)
+      .map(d => ({ sym: d.sym, full: d.full }));
+  } else {
+    batch = RP_SYMBOLS.slice(0, FIB_MAX_SCAN);
+    if (progress) progress.textContent = 'داده‌ی ورود پول هنوز لود نشده؛ ۱۰ نماد اول بررسی می‌شود. برای انتخاب بر اساس ورود پول، اول تب «رد پول» را باز کن.';
+  }
+  const total = batch.length;
+  fibScanTotal = total;
   let done = 0, ok = 0;
-  for (const item of RP_SYMBOLS) {
+  for (const item of batch) {
     if (fibCancelled) break;
     const sym = item.sym;
     fibData[sym] = { status: 'loading', full: item.full };
@@ -7024,7 +7040,7 @@ function fibRenderTable(q) {
   const buyEl = document.getElementById('fibStatBuy');
 
   const syms = Object.keys(fibData);
-  if (checkedEl) checkedEl.textContent = syms.length ? `${syms.length}/${RP_SYMBOLS.length}` : '—';
+  if (checkedEl) checkedEl.textContent = syms.length ? `${syms.length}/${fibScanTotal}` : '—';
 
   const rows = syms.map(sym => ({ sym, d: fibData[sym] }));
   if (buyEl) buyEl.textContent = rows.filter(r => r.d.status === 'ok' && r.d.result).length || '۰';
